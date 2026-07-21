@@ -1,0 +1,69 @@
+---
+import "@/styles/scaling-difficult.css";
+import SiteNav from "@/components/site/SiteNav";
+import SiteFooter from "@/components/site/SiteFooter";
+import EmberParticles from "@/components/wiki/EmberParticles";
+
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Summer Fantasy | Servidor de Minecraft",
+  description = "Servidor de Minecraft 1.20.1 con Forge. Supervivencia, tecnología, magia, bosses y combate.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" class="scroll-smooth dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>{title}</title>
+  </head>
+  <body class="flex min-h-screen flex-col bg-background text-foreground">
+    <div
+      id="embers"
+      class="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      aria-hidden="true"
+    >
+    </div>
+    <EmberParticles client:load />
+
+    <SiteNav client:load />
+
+    <main class="flex-1 pt-16">
+      <slot />
+    </main>
+
+    <SiteFooter />
+
+    <script>
+      import { animate, stagger } from "animejs";
+
+      document.addEventListener("DOMContentLoaded", () => {
+        animate(".reveal", {
+          opacity: [0, 1],
+          translateY: [20, 0],
+          scale: [0.97, 1],
+          duration: 500,
+          ease: "outBack(1.4)",
+          delay: stagger(50),
+        });
+
+        animate(".pop", {
+          opacity: [0, 1],
+          scale: [0.6, 1],
+          duration: 450,
+          ease: "outElastic(1, .6)",
+          delay: stagger(70, { start: 100 }),
+        });
+      });
+    </script>
+  </body>
+</html>

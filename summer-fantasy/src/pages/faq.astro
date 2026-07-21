@@ -1,0 +1,19 @@
+---
+import Layout from "@layouts/Layout.astro";
+import FaqList from "@components/faq/FaqList.astro";
+import { getCollection } from "astro:content";
+
+const faqEntries = await getCollection("faq");
+const sortedFaq = faqEntries.sort((a, b) => a.data.order - b.data.order);
+---
+
+<Layout
+  title="FAQ | Summer Fantasy"
+  description="Preguntas frecuentes sobre el servidor Summer Fantasy de Minecraft."
+>
+  <section class="py-16 lg:py-24">
+    <div class="mx-auto max-w-6xl px-6">
+      <FaqList faqs={sortedFaq} />
+    </div>
+  </section>
+</Layout>

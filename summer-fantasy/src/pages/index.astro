@@ -1,0 +1,21 @@
+---
+import Layout from "@layouts/Layout.astro";
+import HomeApp from "@/components/site/HomeApp";
+import { getEntry } from "astro:content";
+
+const serverEntry = await getEntry("server", "info");
+const serverData = serverEntry?.data;
+
+const server = {
+  version: serverData?.version ?? "1.20.1",
+  loader: serverData?.loader ?? "Forge",
+  region: serverData?.region ?? "Europa",
+  ip: serverData?.ip ?? "summer-fantasy.dg.vg",
+  modCount: serverData?.modCount ?? 0,
+  slots: serverData?.slots ?? 0,
+};
+---
+
+<Layout>
+  <HomeApp client:load server={server} />
+</Layout>

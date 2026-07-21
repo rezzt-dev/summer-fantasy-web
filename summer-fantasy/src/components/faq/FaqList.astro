@@ -1,0 +1,428 @@
+---
+import { render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  faqs: CollectionEntry<"faq">[];
+}
+
+const { faqs } = Astro.props;
+
+const items = await Promise.all(
+  faqs.map(async (faq) => {
+    const { Content } = await render(faq);
+    return { question: faq.data.question, Content };
+  })
+);
+---
+
+<div class="faq-wrapper" data-faq-list>
+  <div class="faq-hero">
+    <div class="faq-badge">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+      <span>Ayuda rápida</span>
+    </div>
+    <h1 class="faq-title">Preguntas frecuentes</h1>
+    <p class="faq-subtitle">Respuestas a las dudas más comunes sobre Summer Fantasy.</p>
+
+    <div class="faq-search">
+      <svg
+        class="faq-search-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.3-4.3"></path>
+      </svg>
+      <input
+        type="text"
+        class="faq-search-input"
+        placeholder="Buscar una pregunta..."
+        data-faq-search
+      />
+    </div>
+  </div>
+
+  <div class="faq-grid">
+    {
+      items.map((item, i) => (
+        <details class="faq-item" data-faq-item data-faq-index={i}>
+          <summary class="faq-question">
+            <span class="faq-question-text">{item.question}</span>
+            <span class="faq-icon" aria-hidden="true">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m6 9 6 6 6-6"></path>
+              </svg>
+            </span>
+          </summary>
+          <div class="faq-answer">
+            <div class="faq-answer-inner prose">
+              <item.Content />
+            </div>
+          </div>
+        </details>
+      ))
+    }
+  </div>
+
+  <p class="faq-empty" data-faq-empty>
+    No se encontraron preguntas que coincidan con tu búsqueda.
+  </p>
+</div>
+
+<script>
+  import { animate, stagger } from "animejs";
+
+  (function initFaq() {
+    const container = document.querySelector("[data-faq-list]");
+    if (!container) return;
+
+    const searchInput = container.querySelector("[data-faq-search]") as HTMLInputElement | null;
+    const items = container.querySelectorAll("[data-faq-item]");
+    const emptyMessage = container.querySelector("[data-faq-empty]") as HTMLElement | null;
+
+    animate(items, {
+      opacity: [0, 1],
+      translateY: [12, 0],
+      scale: [0.98, 1],
+      duration: 350,
+      ease: "outBack(1.4)",
+      delay: stagger(35, { start: 50 }),
+    });
+
+    items.forEach((item) => {
+      const summary = item.querySelector(".faq-question") as HTMLElement | null;
+      const answer = item.querySelector(".faq-answer") as HTMLElement | null;
+      const inner = item.querySelector(".faq-answer-inner") as HTMLElement | null;
+      const icon = item.querySelector(".faq-icon") as HTMLElement | null;
+      if (!summary || !answer || !inner || !icon) return;
+
+      summary.addEventListener("click", (e) => {
+        e.preventDefault();
+        const isOpen = item.hasAttribute("open");
+
+        items.forEach((other) => {
+          if (other !== item && other.hasAttribute("open")) {
+            other.removeAttribute("open");
+            const otherAnswer = other.querySelector(".faq-answer") as HTMLElement;
+            const otherIcon = other.querySelector(".faq-icon") as HTMLElement;
+            animate(otherAnswer, {
+              height: [otherAnswer.scrollHeight, 0],
+              opacity: [1, 0],
+              duration: 300,
+              ease: "inQuad",
+            });
+            animate(otherIcon, {
+              rotate: 0,
+              duration: 250,
+              ease: "outQuad",
+            });
+          }
+        });
+
+        if (isOpen) {
+          item.removeAttribute("open");
+          animate(answer, {
+            height: [answer.scrollHeight, 0],
+            opacity: [1, 0],
+            duration: 220,
+            ease: "inQuad",
+          });
+          animate(icon, {
+            rotate: 0,
+            duration: 250,
+            ease: "outQuad",
+          });
+        } else {
+          item.setAttribute("open", "");
+          answer.style.height = "0px";
+          answer.style.opacity = "0";
+          animate(answer, {
+            height: [0, answer.scrollHeight],
+            opacity: [0, 1],
+            duration: 260,
+            ease: "outQuad",
+          });
+          animate(icon, {
+            rotate: 180,
+            duration: 250,
+            ease: "outQuad",
+          });
+        }
+      });
+    });
+
+    if (!searchInput || items.length === 0) return;
+
+    searchInput.addEventListener("input", () => {
+      const term = searchInput.value.toLowerCase().trim();
+      let visibleCount = 0;
+
+      items.forEach((item) => {
+        const questionEl = item.querySelector(".faq-question-text");
+        const answerEl = item.querySelector(".faq-answer");
+        const question = questionEl?.textContent?.toLowerCase() || "";
+        const answer = answerEl?.textContent?.toLowerCase() || "";
+        const matches = question.includes(term) || answer.includes(term);
+
+        (item as HTMLElement).style.display = matches ? "block" : "none";
+        if (matches) visibleCount++;
+      });
+
+      if (emptyMessage) {
+        emptyMessage.style.display = visibleCount === 0 ? "block" : "none";
+      }
+    });
+  })();
+</script>
+
+<style>
+  .faq-wrapper {
+    max-width: 850px;
+    margin: 0 auto;
+  }
+
+  .faq-hero {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .faq-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 2px solid var(--border);
+    background: var(--secondary);
+    padding: 0.375rem 0.875rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted-foreground);
+    margin-bottom: 1rem;
+  }
+
+  .faq-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--foreground);
+    font-family: var(--font-heading);
+  }
+
+  .faq-subtitle {
+    margin-top: 0.75rem;
+    font-weight: 600;
+    color: var(--muted-foreground);
+  }
+
+  .faq-search {
+    position: relative;
+    margin-top: 2rem;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .faq-search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted-foreground);
+    pointer-events: none;
+  }
+
+  .faq-search-input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 2px solid var(--border);
+    border-radius: 0;
+    background: var(--card);
+    color: var(--foreground);
+    font-size: 1rem;
+    font-weight: 600;
+    outline: none;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .faq-search-input::placeholder {
+    color: var(--muted-foreground);
+  }
+
+  .faq-search-input:focus {
+    border-color: var(--primary);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--primary);
+  }
+
+  .faq-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .faq-item {
+    border: 2px solid var(--border);
+    background: var(--card);
+    box-shadow:
+      inset 0 0 40px rgba(0, 0, 0, 0.4),
+      0 4px 0 rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+  }
+
+  .faq-item:hover {
+    border-color: color-mix(in srgb, var(--border) 70%, var(--primary));
+  }
+
+  .faq-item[open] {
+    border-color: var(--primary);
+  }
+
+  .faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 700;
+    color: var(--foreground);
+    transition: color 0.2s ease;
+  }
+
+  .faq-question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-question-text {
+    flex: 1;
+    text-align: left;
+  }
+
+  .faq-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid var(--border);
+    background: var(--secondary);
+    color: var(--muted-foreground);
+    flex-shrink: 0;
+    transition: transform 0.25s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .faq-item[open] .faq-icon {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .faq-answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+
+  .faq-answer-inner {
+    overflow: hidden;
+    padding: 0 1.5rem;
+  }
+
+  .faq-item[open] .faq-answer-inner {
+    padding-bottom: 1.5rem;
+  }
+
+  .faq-empty {
+    display: none;
+    margin-top: 2rem;
+    text-align: center;
+    color: var(--muted-foreground);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  /* Prose overrides inside FAQ answer */
+  .faq-answer-inner :global(p) {
+    margin-bottom: 0.75rem;
+    color: var(--muted-foreground);
+    line-height: 1.7;
+  }
+
+  .faq-answer-inner :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .faq-answer-inner :global(strong) {
+    color: var(--foreground);
+    font-weight: 700;
+  }
+
+  .faq-answer-inner :global(a) {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 700;
+  }
+
+  .faq-answer-inner :global(a:hover) {
+    color: #ff6b4a;
+  }
+
+  .faq-answer-inner :global(ul) {
+    margin-bottom: 0.75rem;
+    padding-left: 1.25rem;
+    color: var(--muted-foreground);
+  }
+
+  .faq-answer-inner :global(li) {
+    margin-bottom: 0.35rem;
+  }
+
+  .faq-answer-inner :global(code) {
+    background: var(--muted);
+    color: var(--primary);
+    padding: 0.15rem 0.4rem;
+    border: 1px solid var(--border);
+    border-radius: 0.25rem;
+    font-size: 0.85em;
+    font-weight: 700;
+  }
+
+  @media (max-width: 640px) {
+    .faq-title {
+      font-size: 2rem;
+    }
+
+    .faq-question {
+      padding: 1rem 1.25rem;
+    }
+
+    .faq-answer-inner {
+      padding: 0 1.25rem;
+    }
+
+    .faq-item[open] .faq-answer-inner {
+      padding-bottom: 1.25rem;
+    }
+  }
+</style>

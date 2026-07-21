@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <style>
+      .bg { fill: #1c1917; }
+      .sun { fill: #f59e0b; }
+      .ray { fill: #ef4444; }
+      .gem { fill: #451a03; }
+      @media (prefers-color-scheme: dark) {
+        .bg { fill: #0c0a09; }
+      }
+    </style>
+  </defs>
+  <!-- Stone-dark background -->
+  <rect class="bg" width="128" height="128" rx="14"/>
+  <!-- Four pixel rays -->
+  <rect class="ray" x="16" y="16" width="22" height="22" rx="4"/>
+  <rect class="ray" x="90" y="16" width="22" height="22" rx="4"/>
+  <rect class="ray" x="16" y="90" width="22" height="22" rx="4"/>
+  <rect class="ray" x="90" y="90" width="22" height="22" rx="4"/>
+  <!-- Central sun block -->
+  <rect class="sun" x="34" y="34" width="60" height="60" rx="10"/>
+  <!-- Inner fantasy gem / highlight -->
+  <rect class="gem" x="54" y="54" width="20" height="20" rx="4"/>
+</svg>

@@ -1,0 +1,40 @@
+---
+import "@/styles/scaling-difficult.css";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = "Wiki interactiva del mod para jugadores de Summer Fantasy.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" class="scroll-smooth dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="description" content={description} />
+    <title>{title} | Wiki de Mods | Summer Fantasy</title>
+  </head>
+  <body class="min-h-screen overflow-x-hidden bg-background text-foreground">
+    <div
+      id="embers"
+      class="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      aria-hidden="true"
+    >
+    </div>
+    <a
+      href="/"
+      class="fixed left-4 top-20 z-50 hidden rounded border border-border bg-card/90 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground backdrop-blur hover:border-primary hover:text-primary xl:block"
+    >
+      ← Volver al inicio
+    </a>
+    <slot />
+  </body>
+</html>

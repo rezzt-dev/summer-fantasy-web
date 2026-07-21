@@ -1,0 +1,72 @@
+---
+import Layout from "@layouts/Layout.astro";
+---
+
+<Layout
+  title="Página no encontrada | Summer Fantasy"
+  description="La página que buscas no existe."
+>
+  <section class="relative flex flex-1 items-center overflow-hidden py-32">
+    {/* Background glows */}
+    <div class="pointer-events-none absolute inset-0 opacity-30">
+      <div class="absolute left-1/4 top-1/4 h-64 w-64 rounded-full bg-red-900/20 blur-[100px]"></div>
+      <div class="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-orange-900/10 blur-[120px]"></div>
+    </div>
+
+    <div class="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-lg">
+        <div class="dungeon-panel parchment tape mx-auto mb-8 flex h-28 w-28 items-center justify-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="56"
+            height="56"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-[#8a1c1c]"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" x2="12" y1="8" y2="12"></line>
+            <line x1="12" x2="12.01" y1="16" y2="16"></line>
+          </svg>
+        </div>
+
+        <p class="reveal text-8xl font-bold tracking-tighter text-foreground" style={{ fontFamily: 'var(--font-heading)' }}>
+          404
+        </p>
+        <h1 class="reveal mt-4 text-3xl font-bold text-foreground">
+          Página no encontrada
+        </h1>
+        <p class="reveal mx-auto mt-4 max-w-md text-lg text-muted-foreground">
+          Parece que te has perdido en el mapa. Vuelve a un lugar seguro antes de que anochezca.
+        </p>
+        <div class="reveal mt-8">
+          <a
+            href="/"
+            class="inline-flex items-center justify-center border-2 border-[#8a1c1c] bg-[#c23b22] px-6 py-3 text-sm font-bold uppercase tracking-wider text-[#0a0808] transition-colors hover:bg-[#d64a2e]"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="mr-2"
+            >
+              <path d="m12 19-7-7 7-7"></path>
+              <path d="M19 12H5"></path>
+            </svg>
+            Volver al inicio
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
